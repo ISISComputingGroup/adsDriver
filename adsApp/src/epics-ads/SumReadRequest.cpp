@@ -5,11 +5,13 @@
 #include <stdexcept>
 #include <mutex>
 
-#include "AdsLib.h"
-
 #include "SumReadRequest.h"
 #include "Connection.h"
 #include "err.h"
+
+#ifndef ADSIGRP_SUMUP_READ
+#define ADSIGRP_SUMUP_READ 0xF080
+#endif
 
 /* Struct containing data needed to perform a single sum-read ADS operation */
 struct ReadRequestChunk {
@@ -127,7 +129,7 @@ int SumReadRequest::allocate(
             chunk->add_variable(var);
         } catch (const std::exception &ex) {
             LOG_ERR("could not add ADS variable to read-request-chunk");
-            goto ERROR;
+            goto ALLOC_ERROR;
         }
     }
 
@@ -143,7 +145,7 @@ int SumReadRequest::allocate(
             if (rc != 0) {
                 LOG_ERR("failed to initialize sum-read data buffer (%i): %s",
                         rc, ads_errors[rc].c_str());
-                goto ERROR;
+                goto ALLOC_ERROR;
             }
         }
     }
@@ -152,7 +154,7 @@ int SumReadRequest::allocate(
 
     return 0;
 
-ERROR:
+ALLOC_ERROR:
     this->deallocate();
     return EPICSADS_ERROR;
 }
@@ -246,6 +248,7 @@ void SumReadRequest::set_buffers_state(
     }
 }
 
+
 int SumReadRequest::read() {
     if (this->initialized == false) {
         return EPICSADS_INV_CALL;
@@ -267,7 +270,11 @@ int SumReadRequest::read() {
             sizeof(AdsSymbolInfoByName);
         uint8_t *write_buffer =
             (uint8_t *)(*chunk_itr)->sum_read_request_buffer.data();
+#ifdef USE_TC_ADS
+        ads_ui32 bytes_read = 0;
+#else
         uint32_t bytes_read = 0;
+#endif
 
         if (sum_read_data_buffer->is_initialized() == false) {
             return EPICSADS_NOT_INITIALIZED;
