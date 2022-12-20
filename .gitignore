@@ -3,10 +3,10 @@
 # SPDX-License-Identifier: MIT-0
 
 O.*/
-bin/
-db/
-dbd/
-lib/
+/bin/
+/db/
+/dbd/
+/lib/
 envPaths
 adsSup/obj
 adsSup/*.so

@@ -1,0 +1,12 @@
+ASYN = $(SUPPORT)/asyn/master
+AUTOPARAM = $(SUPPORT)/autoparamDriver/master
+BOOST = $(EPICS_KIT_ROOT)/libraries/master/boost
+ONCRP = $(SUPPORT)/oncrpc/master
+
+# twincat only on windows
+ifeq ($(findstring linux,$(EPICS_HOST_ARCH)),)
+TCDIR=C:/TwinCAT
+endif
+
+include $(TOP)/../../../ISIS_CONFIG
+-include $(TOP)/../../../ISIS_CONFIG.$(EPICS_HOST_ARCH)
