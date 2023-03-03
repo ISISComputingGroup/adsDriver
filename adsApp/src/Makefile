@@ -27,7 +27,7 @@ USR_CXXFLAGS_Linux += -std=c++11
 ads_SYS_LIBS_Linux += pthread
 else
 USR_CXXFLAGS_Linux += -std=c++14
-ads_SYS_LIBS += boost_thread
+ads_SYS_LIBS_Linux += boost_thread
 endif
 
 USR_CXXFLAGS_WIN32 += -DNOMINMAX
@@ -88,6 +88,7 @@ ads_SYS_LIBS_WIN32 += $(TCDIR)/AdsApi/TcAdsDll/Lib/TcAdsDll
 endif
 endif
 ads_SYS_LIBS_WIN32 += ws2_32
+ads_SYS_LIBS_WIN32 += $(BOOSTBINDIR)/*
 
 #===========================
 

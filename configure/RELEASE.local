@@ -8,5 +8,7 @@ ifeq ($(findstring linux,$(EPICS_HOST_ARCH)),)
 TCDIR=C:/TwinCAT
 endif
 
+BOOSTBINDIR=C:\Instrument\Apps\EPICS\ICP_Binaries\boost_bin\release
+
 include $(TOP)/../../../ISIS_CONFIG
 -include $(TOP)/../../../ISIS_CONFIG.$(EPICS_HOST_ARCH)
