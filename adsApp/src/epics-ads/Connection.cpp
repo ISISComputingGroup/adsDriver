@@ -24,9 +24,9 @@ Connection::Connection() {}
 Connection::~Connection() {}
 
 void Connection::set_local_ams_id(const AmsNetId ams_id) {
-	#ifndef USE_TC_ADS
+#ifndef USE_TC_ADS
     AdsSetLocalAddress(ams_id);
-	#endif
+#endif
 }
 
 int Connection::connect(const AmsNetId ams_id, const std::string address, const uint16_t device_read_ads_port) {
