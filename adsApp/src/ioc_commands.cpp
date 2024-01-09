@@ -131,7 +131,7 @@ epicsShareFunc int getAdsVar(const char *macroname, char *varname,
 
     std::string id(AmsNetID);
     std::string adsvar(varname);
-    printf("getting value for %s", adsvar);
+    printf("getting value for %s\n", adsvar.c_str());
 
     long      nErr, nPort; 
     AmsAddr   Addr; 
@@ -148,14 +148,14 @@ epicsShareFunc int getAdsVar(const char *macroname, char *varname,
     nErr = AdsSyncReadWriteReq(pAddr, ADSIGRP_SYM_HNDBYNAME, 0x0,
                                sizeof(lHdlVar), &lHdlVar, sizeof(szVar), szVar);
     if (nErr) {
-        printf("Error: AdsSyncReadWriteReq: %i \n" , nErr);
+        errlogPrintf("Error: AdsSyncReadWriteReq: %i \n" , nErr);
         return 1;
     } 
 
     // Read the value of a PLC-variable, via handle 
     nErr = AdsSyncReadReq(pAddr, ADSIGRP_SYM_VALBYHND, lHdlVar, sizeof(nData), &nData ); 
     if (nErr) {
-        printf("Error: AdsSyncReadReq: %i \n" , nErr);
+        errlogPrintf("Error: AdsSyncReadReq: %i \n" , nErr);
         return 1;
     }
     else {
@@ -165,18 +165,18 @@ epicsShareFunc int getAdsVar(const char *macroname, char *varname,
     // Release the handle of the PLC-variable
     nErr = AdsSyncWriteReq(pAddr, ADSIGRP_SYM_RELEASEHND, 0, sizeof(lHdlVar), &lHdlVar); 
     if (nErr) {
-        printf("Error: AdsSyncWriteReq: %i \n" , nErr);
+        errlogPrintf("Error: AdsSyncWriteReq: %i \n" , nErr);
         return 1;
     }
 
     // Close the communication port
     nErr = AdsPortClose(); 
     if (nErr) {
-        printf("Error: AdsPortClose: %i \n" , nErr);
+        errlogPrintf("Error: AdsPortClose: %i \n" , nErr);
         return 1;
     } 
 
-    printf("Value is %d", nData);
+    printf("Value is %d\n", nData);
 
     char result_str[32];
     sprintf(result_str, "%i", result);
