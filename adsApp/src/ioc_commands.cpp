@@ -3,12 +3,15 @@
 // SPDX-License-Identifier: MIT
 
 #include <cstring>
+#include <string>
+#include <sstream>
 #include <map>
 #include <memory>
 #include <iocsh.h>
 #include <errlog.h>
 #include "ADSPortDriver.h"
 #include <epicsExport.h>
+#include "envDefs.h"
 
 static const iocshArg ads_open_arg = {"parameters", iocshArgArgv};
 static const iocshArg *ads_open_args[1] = {&ads_open_arg};
@@ -101,6 +104,86 @@ epicsShareFunc void ads_set_local_amsNetID(const char *ams) {
     return;
 }
 
+AmsNetId make_AmsNetId(const std::string& addr)
+{
+    std::istringstream iss(addr);
+    std::string s;
+    size_t i = 0;
+    AmsNetId id {};
+
+    while ((i < sizeof(id.b)) && std::getline(iss, s, '.')) {
+        id.b[i] = atoi(s.c_str()) % 256;
+        ++i;
+    }
+
+    if ((i != sizeof(id.b)) || std::getline(iss, s, '.')) {
+        memset(id.b, 0, sizeof(id.b));
+    }
+    return id;
+}
+
+
+// Get an arbritary ADS variable value and set the given macro to this value. 
+epicsShareFunc int getAdsVar(const char *macroname, char *varname,
+                             const char *ipAddr, const char *AmsNetID,
+                             int adsPort) {
+    int result = 0;
+
+    std::string id(AmsNetID);
+    std::string adsvar(varname);
+    printf("getting value for %s\n", adsvar.c_str());
+
+    long      nErr, nPort; 
+    AmsAddr   Addr; 
+    PAmsAddr  pAddr = &Addr; 
+    long      lHdlVar, nData; 
+    char szVar[32];
+    strcpy(szVar, adsvar.c_str()); 
+
+    // Open communication port on the ADS router
+    nPort = AdsPortOpen();
+    pAddr->port = adsPort;
+    pAddr->netId = make_AmsNetId(id);
+
+    nErr = AdsSyncReadWriteReq(pAddr, ADSIGRP_SYM_HNDBYNAME, 0x0,
+                               sizeof(lHdlVar), &lHdlVar, sizeof(szVar), szVar);
+    if (nErr) {
+        errlogPrintf("Error: AdsSyncReadWriteReq: %i \n" , nErr);
+        return 1;
+    } 
+
+    // Read the value of a PLC-variable, via handle 
+    nErr = AdsSyncReadReq(pAddr, ADSIGRP_SYM_VALBYHND, lHdlVar, sizeof(nData), &nData ); 
+    if (nErr) {
+        errlogPrintf("Error: AdsSyncReadReq: %i \n" , nErr);
+        return 1;
+    }
+    else {
+        result = nData; 
+    }
+
+    // Release the handle of the PLC-variable
+    nErr = AdsSyncWriteReq(pAddr, ADSIGRP_SYM_RELEASEHND, 0, sizeof(lHdlVar), &lHdlVar); 
+    if (nErr) {
+        errlogPrintf("Error: AdsSyncWriteReq: %i \n" , nErr);
+        return 1;
+    }
+
+    // Close the communication port
+    nErr = AdsPortClose(); 
+    if (nErr) {
+        errlogPrintf("Error: AdsPortClose: %i \n" , nErr);
+        return 1;
+    } 
+
+    printf("Value is %d\n", nData);
+
+    char result_str[32];
+    sprintf(result_str, "%i", result);
+    epicsEnvSet(macroname, result_str);
+    return 0;
+}
+
 static void ads_open_call_func(const iocshArgBuf *args) {
     ads_open(args[0].aval.ac, args[0].aval.av);
 }
@@ -129,6 +212,27 @@ static void ads_set_local_amsNetID_register_command(void) {
 }
 
 extern "C" {
+static const iocshArg getAdsVarInitArg0 = { "macro", iocshArgString }; ///< The name of the macro to put the result of the calculation into.
+static const iocshArg getAdsVarInitArg1 = { "varname", iocshArgString }; ///< The left hand side argument.
+static const iocshArg getAdsVarInitArg2 = { "ipAddr", iocshArgString }; ///< IP address of the beckhoff.
+static const iocshArg getAdsVarInitArg3 = { "AmsNetID", iocshArgString }; ///< The AMSNETID of the beckhoff.
+static const iocshArg getAdsVarInitArg4 = { "adsPort", iocshArgInt}; /// < The ADS port. 
+
+static const iocshArg * const getAdsVarInitArgs[] = { &getAdsVarInitArg0, &getAdsVarInitArg1, &getAdsVarInitArg2, &getAdsVarInitArg3, &getAdsVarInitArg4};
+
+static const iocshFuncDef getAdsVarInitFuncDef = {"getAdsVar", sizeof(getAdsVarInitArgs) / sizeof(iocshArg*), getAdsVarInitArgs};
+
+static void getAdsVarInitCallFunc(const iocshArgBuf *args)
+{
+    getAdsVar(args[0].sval, args[1].sval, args[2].sval, args[3].sval, args[4].ival);
+}
+
+static void ads_getAdsVar_register_command(void)
+{
+    iocshRegister(&getAdsVarInitFuncDef, getAdsVarInitCallFunc);
+}
+
+epicsExportRegistrar(ads_getAdsVar_register_command);
 epicsExportRegistrar(ads_open_register_command);
 epicsExportRegistrar(ads_set_local_amsNetID_register_command);
 }
