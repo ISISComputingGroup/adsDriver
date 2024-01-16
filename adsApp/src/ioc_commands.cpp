@@ -148,6 +148,7 @@ epicsShareFunc int getAdsVar(const char *macroname, char *varname,
                                sizeof(lHdlVar), &lHdlVar, sizeof(szVar), szVar, nullptr);
     if (nErr) {
         errlogPrintf("Error: AdsSyncReadWriteReqEx2: %li \n" , nErr);
+        AdsPortCloseEx(nPort); 
         return 1;
     } 
 
@@ -155,6 +156,7 @@ epicsShareFunc int getAdsVar(const char *macroname, char *varname,
     nErr = AdsSyncReadReqEx2(nPort, &Addr, ADSIGRP_SYM_VALBYHND, lHdlVar, sizeof(nData), &nData, nullptr ); 
     if (nErr) {
         errlogPrintf("Error: AdsSyncReadReqEx2: %li \n" , nErr);
+        AdsPortCloseEx(nPort); 
         return 1;
     }
     else {
@@ -165,6 +167,7 @@ epicsShareFunc int getAdsVar(const char *macroname, char *varname,
     nErr = AdsSyncWriteReqEx(nPort, &Addr, ADSIGRP_SYM_RELEASEHND, 0, sizeof(lHdlVar), &lHdlVar); 
     if (nErr) {
         errlogPrintf("Error: AdsSyncWriteReqEx: %li \n" , nErr);
+        AdsPortCloseEx(nPort); 
         return 1;
     }
 
