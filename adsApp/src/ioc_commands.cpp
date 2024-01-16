@@ -104,7 +104,7 @@ epicsShareFunc void ads_set_local_amsNetID(const char *ams) {
     return;
 }
 
-AmsNetId make_AmsNetId(const std::string& addr)
+static AmsNetId make_AmsNetId(const std::string& addr)
 {
     std::istringstream iss(addr);
     std::string s;
@@ -135,27 +135,26 @@ epicsShareFunc int getAdsVar(const char *macroname, char *varname,
 
     long      nErr, nPort; 
     AmsAddr   Addr; 
-    PAmsAddr  pAddr = &Addr; 
     long      lHdlVar, nData; 
     char szVar[32];
     strcpy(szVar, adsvar.c_str()); 
 
     // Open communication port on the ADS router
-    nPort = AdsPortOpen();
-    pAddr->port = adsPort;
-    pAddr->netId = make_AmsNetId(id);
+    nPort = AdsPortOpenEx();
+    Addr.port = adsPort;
+    Addr.netId = make_AmsNetId(id);
 
-    nErr = AdsSyncReadWriteReq(pAddr, ADSIGRP_SYM_HNDBYNAME, 0x0,
-                               sizeof(lHdlVar), &lHdlVar, sizeof(szVar), szVar);
+    nErr = AdsSyncReadWriteReqEx2(nPort, &Addr, ADSIGRP_SYM_HNDBYNAME, 0x0,
+                               sizeof(lHdlVar), &lHdlVar, sizeof(szVar), szVar, nullptr);
     if (nErr) {
-        errlogPrintf("Error: AdsSyncReadWriteReq: %i \n" , nErr);
+        errlogPrintf("Error: AdsSyncReadWriteReqEx2: %li \n" , nErr);
         return 1;
     } 
 
     // Read the value of a PLC-variable, via handle 
-    nErr = AdsSyncReadReq(pAddr, ADSIGRP_SYM_VALBYHND, lHdlVar, sizeof(nData), &nData ); 
+    nErr = AdsSyncReadReqEx2(nPort, &Addr, ADSIGRP_SYM_VALBYHND, lHdlVar, sizeof(nData), &nData, nullptr ); 
     if (nErr) {
-        errlogPrintf("Error: AdsSyncReadReq: %i \n" , nErr);
+        errlogPrintf("Error: AdsSyncReadReqEx2: %li \n" , nErr);
         return 1;
     }
     else {
@@ -163,20 +162,20 @@ epicsShareFunc int getAdsVar(const char *macroname, char *varname,
     }
 
     // Release the handle of the PLC-variable
-    nErr = AdsSyncWriteReq(pAddr, ADSIGRP_SYM_RELEASEHND, 0, sizeof(lHdlVar), &lHdlVar); 
+    nErr = AdsSyncWriteReqEx(nPort, &Addr, ADSIGRP_SYM_RELEASEHND, 0, sizeof(lHdlVar), &lHdlVar); 
     if (nErr) {
-        errlogPrintf("Error: AdsSyncWriteReq: %i \n" , nErr);
+        errlogPrintf("Error: AdsSyncWriteReqEx: %li \n" , nErr);
         return 1;
     }
 
     // Close the communication port
-    nErr = AdsPortClose(); 
+    nErr = AdsPortCloseEx(nPort); 
     if (nErr) {
-        errlogPrintf("Error: AdsPortClose: %i \n" , nErr);
+        errlogPrintf("Error: AdsPortClose: %li \n" , nErr);
         return 1;
     } 
 
-    printf("Value is %d\n", nData);
+    printf("Value is %ld\n", nData);
 
     char result_str[32];
     sprintf(result_str, "%i", result);
