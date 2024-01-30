@@ -171,8 +171,12 @@ int ADSVariable::read(uint8_t *data, const uint32_t size,
     /* Number of bytes to read is set to whichever is smaller (bytewise). If it
      * is the PLC variable, the driver shouldn't read past it. If data buffer is
      * smaller, the driver shouldn't write past it. */
-    uint32_t bytes_to_read = std::min(size, this->size());
-
+#ifdef USE_TC_ADS
+    unsigned long
+#else
+    uint32_t
+#endif
+                  bytes_to_read = std::min(size, this->size());
     std::lock_guard<epicsMutex> lock(this->conn->mtx);
 
     AmsAddr remote_ams_addr = {this->conn->get_remote_ams_netid(),
@@ -186,9 +190,9 @@ int ADSVariable::read(uint8_t *data, const uint32_t size,
                                 bytes_to_read,                  // data length
                                 data,        // read (result data) buffer
 #ifdef USE_TC_ADS
-                     (ads_ui32*)
+                                reinterpret_cast<unsigned long*>
 #endif
-                                bytes_read); // bytes written into read buffer
+                                (bytes_read)); // bytes written into read buffer
 
     if (rc != 0) {
         return ads_rc_to_epicsads_error(rc);
