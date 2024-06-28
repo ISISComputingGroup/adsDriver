@@ -24,7 +24,7 @@ USR_CXXFLAGS_WIN32 += -DNOMINMAX
 # use ADS from twincat
 ifdef TCDIR
 USR_CXXFLAGS += -DUSE_TC_ADS
-USR_CXXFLAGS += -I$(TCDIR)/3.1/sdk/Include
+USR_CXXFLAGS += -I$(TCDIR)/AdsApi/TcAdsDll/Include
 endif
 
 # specify all source files to be compiled and added to the library

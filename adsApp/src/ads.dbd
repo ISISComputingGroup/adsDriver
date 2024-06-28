@@ -4,3 +4,4 @@
 
 registrar(ads_open_register_command)
 registrar(ads_set_local_amsNetID_register_command)
+registrar(ads_getAdsVar_register_command)

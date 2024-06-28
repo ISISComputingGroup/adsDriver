@@ -271,11 +271,10 @@ int SumReadRequest::read() {
         uint8_t *write_buffer =
             (uint8_t *)(*chunk_itr)->sum_read_request_buffer.data();
 #ifdef USE_TC_ADS
-        ads_ui32 bytes_read = 0;
+        unsigned long bytes_read = 0;
 #else
         uint32_t bytes_read = 0;
 #endif
-
         if (sum_read_data_buffer->is_initialized() == false) {
             return EPICSADS_NOT_INITIALIZED;
         }
