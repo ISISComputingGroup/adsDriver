@@ -82,6 +82,7 @@ class ADSPortDriver : public Autoparam::Driver {
     uint32_t const adsFunctionTimeout;
     const std::shared_ptr<Connection> adsConnection;
     const std::chrono::milliseconds sumReadPeriod;
+    long lastError;
 
     SumReadRequest SumRead;
 

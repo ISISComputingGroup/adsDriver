@@ -341,10 +341,11 @@ asynStatus ADSPortDriver::ADSConnect(asynUser *pasynUser) {
         status = static_cast<asynStatus>(
             adsConnection->resolve_variables(ads_write_vars));
 
-        if (status) {
+        if (status && lastError != status) {
             LOG_ERR_ASYN(pasynUser,
                          "Could not resolve ADS write variable names(%i): %s",
                          status, ads_errors[status].c_str());
+            lastError = status;
             return status;
         }
     }
