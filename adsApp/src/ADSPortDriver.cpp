@@ -329,10 +329,11 @@ asynStatus ADSPortDriver::ADSConnect(asynUser *pasynUser) {
         status = static_cast<asynStatus>(
             adsConnection->resolve_variables(ads_read_vars));
 
-        if (status) {
+        if (status && lastReadError != status) {
             LOG_ERR_ASYN(pasynUser,
                          "Could not resolve ADS read variable names (%i): %s",
                          status, ads_errors[status].c_str());
+            lastReadError = status;
             return status;
         }
     }
@@ -341,11 +342,11 @@ asynStatus ADSPortDriver::ADSConnect(asynUser *pasynUser) {
         status = static_cast<asynStatus>(
             adsConnection->resolve_variables(ads_write_vars));
 
-        if (status && lastError != status) {
+        if (status && lastWriteError != status) {
             LOG_ERR_ASYN(pasynUser,
                          "Could not resolve ADS write variable names(%i): %s",
                          status, ads_errors[status].c_str());
-            lastError = status;
+            lastWriteError = status;
             return status;
         }
     }
@@ -354,10 +355,11 @@ asynStatus ADSPortDriver::ADSConnect(asynUser *pasynUser) {
 
     // initialize sum-read buffers
     status = static_cast<asynStatus>(SumRead.initialize());
-    if (status) {
+    if (status && lastSumReadError != status) {
         LOG_ERR_ASYN(pasynUser,
                      "Error initializing sum-read request buffers (%i): %s",
                      status, ads_errors[status].c_str());
+        lastSumReadError = status;
         return status;
     }
 
