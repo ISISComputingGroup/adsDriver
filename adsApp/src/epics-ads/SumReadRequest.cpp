@@ -143,8 +143,8 @@ int SumReadRequest::allocate(
             std::shared_ptr<ReadRequestChunk> chunk = *chunk_itr;
             int rc = chunk->sum_read_data_buffer->initialize_buffer();
             if (rc != 0) {
-                LOG_ERR("failed to initialize sum-read data buffer (%i): %s",
-                        rc, ads_errors[rc].c_str());
+                //LOG_ERR("failed to initialize sum-read data buffer (%i): %s",
+                //        rc, ads_errors[rc].c_str());
                 goto ALLOC_ERROR;
             }
         }
@@ -207,8 +207,8 @@ int SumReadRequest::initialize() {
         for (size_t i_var = 0; i_var < chunk->variables.size(); i_var++) {
             std::shared_ptr<ADSVariable> var = chunk->variables[i_var];
             if (var->addr->is_resolved() == false) {
-                LOG_ERR("variable name is not resolved: '%s'",
-                        var->addr->get_var_name().c_str());
+//                LOG_ERR("variable name is not resolved: '%s'",
+ //                       var->addr->get_var_name().c_str());
                 return EPICSADS_NOT_RESOLVED;
             }
 

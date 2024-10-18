@@ -159,7 +159,7 @@ std::map<long, std::string> errorMap =
 int ads_rc_to_epicsads_error(long ads_rc) {
     auto it = ads_rc_to_epicsads_error_map.find(ads_rc);
     if (it == ads_rc_to_epicsads_error_map.end()) {
-        LOG_ERR("unhandled ADS return code '%li'", ads_rc);
+        //LOG_ERR("unhandled ADS return code '%li'", ads_rc);
         return EPICSADS_UNHANDLED_RC;
     }
 
