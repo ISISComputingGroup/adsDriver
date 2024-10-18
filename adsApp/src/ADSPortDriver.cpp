@@ -336,6 +336,7 @@ asynStatus ADSPortDriver::ADSConnect(asynUser *pasynUser) {
             lastReadError = status;
             return status;
         }
+        lastReadError = 0;
     }
 
     if (ads_write_vars.size()) {
@@ -349,7 +350,9 @@ asynStatus ADSPortDriver::ADSConnect(asynUser *pasynUser) {
             lastWriteError = status;
             return status;
         }
+        lastWriteError = 0;
     }
+    
     LOG_WARN_ASYN(pasynUser, "Resolved %lu read and %lu write variable names",
                   ads_read_vars.size(), ads_write_vars.size());
 
@@ -362,7 +365,7 @@ asynStatus ADSPortDriver::ADSConnect(asynUser *pasynUser) {
         lastSumReadError = status;
         return status;
     }
-
+    lastSumReadError = 0;
     LOG_WARN_ASYN(pasynUser, "Initialized sum-read request buffers");
 
     status = doSumRead();

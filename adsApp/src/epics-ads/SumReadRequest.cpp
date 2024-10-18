@@ -215,6 +215,7 @@ int SumReadRequest::initialize() {
                 }
                 return EPICSADS_NOT_RESOLVED;
             }
+            last = "";
 
             chunk->sum_read_request_buffer[i_var] = {
                 var->addr->get_index_group(), var->addr->get_index_offset(),
