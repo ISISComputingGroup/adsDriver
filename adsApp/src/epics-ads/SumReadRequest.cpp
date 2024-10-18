@@ -207,8 +207,12 @@ int SumReadRequest::initialize() {
         for (size_t i_var = 0; i_var < chunk->variables.size(); i_var++) {
             std::shared_ptr<ADSVariable> var = chunk->variables[i_var];
             if (var->addr->is_resolved() == false) {
-                LOG_ERR("variable name is not resolved: '%s'",
-                        var->addr->get_var_name().c_str());
+                std::string name =  var->addr->get_var_name();
+                if (name !=last) {
+                    LOG_ERR("variable name is not resolved: '%s'",
+                        name.c_str());
+                    last = var->addr->get_var_name();
+                }
                 return EPICSADS_NOT_RESOLVED;
             }
 
