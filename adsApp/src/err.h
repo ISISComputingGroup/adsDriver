@@ -32,10 +32,10 @@
     LOG_MSG_ASYN(asyn_user, ASYN_TRACE_ERROR, "ERROR", format, ##__VA_ARGS__)
 
 #define LOG_WARN_ASYN(asyn_user, format, ...) \
-    LOG_MSG_ASYN(asyn_user, ASYN_TRACE_WARNING, "WARNING", format, ##__VA_ARGS__)
+    //LOG_MSG_ASYN(asyn_user, ASYN_TRACE_WARNING, "WARNING", format, ##__VA_ARGS__)
 
 #define LOG_TRACE_ASYN(asyn_user, format, ...) \
-    LOG_MSG_ASYN(asyn_user, ASYN_TRACE_FLOW, "TRACE", format, ##__VA_ARGS__)
+    //LOG_MSG_ASYN(asyn_user, ASYN_TRACE_FLOW, "TRACE", format, ##__VA_ARGS__)
 
 /* Error logging macros for use when asyn_user is not available */
 #define LOG_MSG(log_level_str, format, ...) \
@@ -45,10 +45,10 @@
     LOG_MSG("ERROR", format, ##__VA_ARGS__)
 
 #define LOG_WARN(format, ...) \
-    LOG_MSG("WARNING", format, ##__VA_ARGS__)
+    //LOG_MSG("WARNING", format, ##__VA_ARGS__)
 
 #define LOG_TRACE(format, ...) \
-    LOG_MSG("TRACE", format, ##__VA_ARGS__)
+    //LOG_MSG("TRACE", format, ##__VA_ARGS__)
 
 /* EPICS ADS specific return codes */
 #define EPICSADS_BASE 1000

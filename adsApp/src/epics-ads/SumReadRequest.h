@@ -10,6 +10,7 @@
 #include <memory>
 #include <cstdint>
 #include <utility>
+#include <string>
 
 #ifdef USE_TC_ADS
 #include <windows.h>
@@ -48,6 +49,7 @@ class SumReadRequest {
     /* Helper method returns a vector of chunks from chunks_by_ads_port_map */
     std::shared_ptr<std::vector<std::shared_ptr<ReadRequestChunk>>>
     get_chunks();
+    std::string last;
 
   public:
     /* Number of chunks, i.e. the number of sub-requests needed to sum-read all
